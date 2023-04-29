@@ -1,0 +1,13 @@
+{
+    "appliance_type": "ev charger",
+    "mode": "eco",
+    "duration_minutes": 240,
+    "energy_use_resolution_in_seconds": 3600,
+    "measurement_method": "EVSE",
+    "energy_usage": [
+        10.8,
+        10.8,
+        10.8,
+        10.8
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "If you need help with the configuration have a look here: https://github.com/fars-fede-fire/price_calc",
+                "data": {
+                    "name": "Name of sensor",
+                    "appliance_file": "Path to appliance file",
+                    "source_sensor": "Energy price sensor"
+                }
+            }
+        }
+    }
+}
