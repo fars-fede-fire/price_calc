@@ -54,7 +54,7 @@ If you already have downloaded a config file or added to the `custom_components/
 Be aware that you need to restart Home Assistant if file is added while Home Assistant is running.
 
 #### URL
-You can share and download config files from [URL]([https://en.wikipedia.org/wiki/Dinosaurs](https://github.com/fars-fede-fire/price_calc_data))
+You can share and download config files from [https://github.com/fars-fede-fire/price_calc_data](https://github.com/fars-fede-fire/price_calc_data)
 1. Find the file you want to use in the repo and open it.
 2. Click 'Raw' in the upper right corner.
 3. Copy the URL and insert during setup when prompted.
