@@ -5,7 +5,8 @@ Home assistant custom component for calculating price of running a electric appl
 For getting the electricity prices the awesome [Energi Data Service](https://github.com/MTrab/energidataservice) custom component from [@MTrab](https://github.com/MTrab) is required.
 
 Simulates the price using a rolling window:
-![price_calc_principle](https://github.com/fars-fede-fire/price_calc/assets/87006332/7dd1a0cc-10d7-47fa-bb48-152ea6ca19d5)  
+![price_calc_principle]  ![price_calc_principle](https://github.com/fars-fede-fire/price_calc/assets/87006332/5f7d30f9-60b9-46bc-a17e-79a85d1ab346)
+
 Blue: electricity price  
 Black: energy usage  
 Red: calculated price for running appliance  
