@@ -39,19 +39,19 @@ from .models import ApplianceData
 
 HISTORY_SOURCE_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_TYPE, default='dishwasher'): selector.TextSelector(),
-        vol.Required(CONF_MANUFACTOR, default='Electrolux'): selector.TextSelector(),
-        vol.Required(CONF_MODEL, default='eeq47200l'): selector.TextSelector(),
-        vol.Required(CONF_MODE, default='eco'): selector.TextSelector(),
-        vol.Required(CONF_MEASURE_METHOD, default='Shelly Plug S'): selector.TextSelector(),
-        vol.Required(CONF_HISTORY_SENSOR, default='sensor.shelly_energy'): selector.EntitySelector(
+        vol.Required(CONF_TYPE): selector.TextSelector(),
+        vol.Required(CONF_MANUFACTOR): selector.TextSelector(),
+        vol.Required(CONF_MODEL): selector.TextSelector(),
+        vol.Required(CONF_MODE): selector.TextSelector(),
+        vol.Required(CONF_MEASURE_METHOD): selector.TextSelector(),
+        vol.Required(CONF_HISTORY_SENSOR): selector.EntitySelector(
             selector.EntitySelectorConfig(domain=SENSOR_DOMAIN)
         ),
         vol.Required(
-            CONF_START_TIME, default="2023-05-17 12:47:35"
+            CONF_START_TIME
         ): selector.DateTimeSelector(selector.DateTimeSelectorConfig()),
         vol.Required(
-            CONF_END_TIME, default="2023-05-17 16:48:28"
+            CONF_END_TIME
         ): selector.DateTimeSelector(selector.DateTimeSelectorConfig()),
     }
 )
