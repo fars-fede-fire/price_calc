@@ -12,9 +12,7 @@
     "numpy",
     "pydantic"
   ],
-  "dependencies": [
-    "energidataservice"
-  ],
+  "dependencies": [],
   "after-dependencies": [
     "energidataservice"
   ],

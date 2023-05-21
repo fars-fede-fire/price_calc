@@ -6,3 +6,17 @@ logger:
   default: info
   logs:
     custom_components.price_calc: debug
+
+
+rest:
+  resource: http://192.168.1.83/meter/0
+  scan_interval: 1
+  sensor:
+    - name: "shelly_energy"
+      unique_id: "blablaenergy"
+      unit_of_measurement: "kWh"
+      value_template: "{{ value_json.total / 60000 }}"
+    - name: "shelly_power"
+      unique_id: "blablapower"
+      value_template: "{{value_json.power}}"
+      unit_of_measurement: "W"

@@ -9,6 +9,8 @@ import numpy as np
 
 from .models import ApplianceData, ApplianceCalculations
 
+from .const import LOGGER
+
 SECONDS_PER_HOUR = 60 * 60
 EXAMPLLE_PRICES = [
     1.264,
@@ -67,10 +69,11 @@ class Calculator:
     """Handling all the calculations."""
 
     appliance_file: str
-    electricity_prices: List[float]
 
-    def calculate_prices(self):
+    def calculate_prices(self, electricity_prices: List[float]):
         """Calculate prices for running appliance."""
+
+        self.electricity_prices = electricity_prices
 
         with open(self.appliance_file, encoding="utf8") as file:
             data = json.load(file)
@@ -107,6 +110,10 @@ class Calculator:
                 self.idx_to_dt(idx, appliance_data.energy_use_resolution_in_seconds)
             ] = price
 
+        summed_prices_dict_price = dict(
+            sorted(summed_prices_dict_dt.items(), key=lambda item: item[1])
+        )
+
         # calculate attributes
         lowest_price = np.min(summed_prices)
         lowest_price_dt = self.idx_to_dt(
@@ -120,17 +127,24 @@ class Calculator:
 
         price_diff = highest_price - lowest_price
 
+        latest_start_time = self.idx_to_dt(
+            len(summed_prices) - 1, appliance_data.energy_use_resolution_in_seconds
+        )
+
         # return above calculations as a dict
         results = {
-            "prices": summed_prices_dict_dt,
+            "prices_by_price": summed_prices_dict_price,
             "lowest_price": lowest_price,
             "lowest_price_dt": lowest_price_dt,
             "highest_price": highest_price,
             "highest_price_dt": highest_price_dt,
             "price_difference": price_diff,
+            "latest_start_time": latest_start_time,
+            "energy_use_resolution_in_seconds": appliance_data.energy_use_resolution_in_seconds
         }
 
         result_model = ApplianceCalculations.parse_obj(results)
+        LOGGER.debug("---  ---  Calculations was made  ---  ---")
         return result_model
 
     def idx_to_dt(self, idx: int, energy_use_resolution_in_seconds: int):
@@ -141,7 +155,5 @@ class Calculator:
 
 
 if __name__ == "__main__":
-    inf = Calculator(
-        "data/electrolux/eeq47200l.json", EXAMPLLE_PRICES
-    ).calculate_prices()
+    inf = Calculator("data/electrolux/eeq47200l.json").calculate_prices(EXAMPLLE_PRICES)
     print(inf)

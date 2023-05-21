@@ -1,89 +1,110 @@
-"""Sensor of price_calc."""
+"""Support for price calc sensors."""
 from __future__ import annotations
 
-import os
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
+from datetime import date, datetime
+from typing import Any, Dict
 
-import voluptuous as vol
 
 from homeassistant.components.sensor import (
-    PLATFORM_SCHEMA,
     SensorDeviceClass,
     SensorEntity,
-    SensorStateClass,
+    SensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-
-from homeassistant.const import CONF_NAME
-from homeassistant.core import Event, HomeAssistant, State, callback
-from homeassistant.helpers import config_validation as cv, entity_registry as er
+from homeassistant.const import CONF_NAME, CONF_FILE_PATH
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.event import async_track_time_change
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN, CONF_SOURCE_SENSOR, LOGGER, CONF_APPLIANCE_FILE
-from .helpers.coordinator import get_platform
+from .coordinator import PriceCalcUpdateCoordinator, PriceCalcData
+from .const import DOMAIN, LOGGER, CONF_ADD_PRICE_DATA
+from .entity import PriceCalcEntity
 
-from .price_calc import Calculator
+
+@dataclass
+class PriceCalcEntityMixin:
+    """Mixin values for price calc entities."""
+
+    value_fn: Callable[[PriceCalcData], float]
+    attrs: Dict[str, Callable[[PriceCalcData], Any]]
+
+
+@dataclass
+class PriceCalcSensorEntityDescription(SensorEntityDescription, PriceCalcEntityMixin):
+    """Price calc sensor description"""
+
+    key: str
+    has_entity_name: bool = False
+    device_class = SensorDeviceClass.MONETARY
+    icon: str = "mdi:timer-play-outline"
+    native_unit_of_measurement = SensorDeviceClass.MONETARY
+    suggested_display_precision = 3
+
+
+SENSORS = [
+    PriceCalcSensorEntityDescription(
+        key="price_now",
+        value_fn=lambda x: x.updated.current_price,
+        attrs={
+            "current time": lambda x: x.updated.current_time,
+            "next lowest": lambda x: x.updated.next_lowest_price_dt,
+            "next lowest price": lambda x: x.updated.next_low_price,
+            "diff_now_and_next_lowest": lambda x: x.updated.diff_now_and_next_lowest,
+            "delay hours": lambda x: x.updated.delay_hours,
+            "delay_hours_price": lambda x: x.updated.delay_hours_price,
+            "diff_now_and_delay": lambda x: x.updated.diff_now_and_delay,
+            "todays_highest": lambda x: x.calcs.highest_price,
+            "today_highest_time": lambda x: x.calcs.highest_price_dt,
+            "todays_lowest": lambda x: x.calcs.lowest_price,
+            "todays_lowest_time": lambda x: x.calcs.lowest_price_dt
+        },
+    ),
+]
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Initialize price calc."""
-    registry = er.async_get(hass)
-    source_entity_id = er.async_validate_entity_id(
-        registry, config_entry.options[CONF_SOURCE_SENSOR]
-    )
-    appliance_file = config_entry.options[CONF_APPLIANCE_FILE]
+    """Setup price calc entry."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
 
-    prices = PriceSensor(
-        name=config_entry.title,
-        source_entity=source_entity_id,
+    async_add_entities(
+        PriceCalcSensor(coordinator, description, entry) for description in SENSORS
     )
 
-    LOGGER.debug(get_platform(hass, entity_id=config_entry.options[CONF_SOURCE_SENSOR]))
-    LOGGER.debug(source_entity_id)
-    LOGGER.debug(os.listdir(os.getcwd()))
-    price_state = hass.states.get(source_entity_id)
-    LOGGER.debug(price_state.attributes["tomorrow"])
 
-    calc = Calculator(
-        appliance_file=appliance_file,
-        electricity_prices=price_state.attributes["today"],
-    )
+class PriceCalcSensor(PriceCalcEntity, SensorEntity):
+    """Representation of Price calc sensor."""
 
-    LOGGER.debug(calc.calculate_prices())
+    entity_description: PriceCalcSensorEntityDescription
 
-    async_add_entities([prices])
+    def __init__(
+        self,
+        coordinator: PriceCalcUpdateCoordinator,
+        description: PriceCalcSensorEntityDescription,
+        entry: ConfigEntry,
+    ) -> None:
+        super().__init__(coordinator, entry)
 
-
-async def async_setup_platform(
-    hass: HomeAssistant, config: ConfigType, async_add_entities: AddEntitiesCallback
-) -> None:
-    """Setup price calc sensor."""
-    prices = PriceSensor(
-        name=config.get(CONF_NAME), source_entity=config[CONF_SOURCE_SENSOR]
-    )
-
-    async_add_entities([prices])
-
-
-class PriceSensor(SensorEntity):
-    """Representation of a price calc sensor."""
-
-    _attr_should_poll = False
-
-    def __init__(self, *, name: str | None, source_entity: str) -> None:
-        """Initialize price calc sensor."""
-        self._sensor_source_id = source_entity
-        self._attr_name = name
-        self._attr_icon = "mdi:chart-histogram"
-
-    async def async_added_to_hass(self) -> None:
-        await super().async_added_to_hass()
+        self.entity_description = description
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_NAME]}_{entry.data[CONF_FILE_PATH]}"
+        self._attr_name = f"{entry.data[CONF_NAME]}"
 
     @property
-    def native_value(self):
-        return 5
+    def native_value(self) -> date | None:
+        return self.entity_description.value_fn(self.coordinator.data)
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any] | None:
+        attr = {}
+        for key in self.entity_description.attrs:
+            attr[key] = self.entity_description.attrs[key](self.coordinator.data)
+        if self.coordinator.config_entry.data[CONF_ADD_PRICE_DATA] is True:
+            attr['price_data'] = self.coordinator.data.calcs.prices_by_price
+
+        return attr
