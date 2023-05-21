@@ -67,7 +67,7 @@ class PriceCalcUpdateCoordinator(DataUpdateCoordinator[PriceCalcData]):
             )
         )
         self.listeners.append(
-            async_track_time_change(self.hass, self.time_update, second=[0, 20, 40])
+            async_track_time_change(self.hass, self.time_update, second=[0])
         )
 
         super().__init__(

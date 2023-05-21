@@ -34,26 +34,25 @@ class PriceCalcEntityMixin:
 
 @dataclass
 class PriceCalcSensorEntityDescription(SensorEntityDescription, PriceCalcEntityMixin):
-    """Price calc sensor description"""
+    """Price calc sensor description."""
 
     key: str
     has_entity_name: bool = False
     device_class = SensorDeviceClass.MONETARY
     icon: str = "mdi:timer-play-outline"
     native_unit_of_measurement = SensorDeviceClass.MONETARY
-    suggested_display_precision = 3
 
 
 SENSORS = [
     PriceCalcSensorEntityDescription(
         key="price_now",
-        value_fn=lambda x: x.updated.current_price,
+        value_fn=lambda x: round(x.updated.current_price,2),
         attrs={
-            "current time": lambda x: x.updated.current_time,
-            "next lowest": lambda x: x.updated.next_lowest_price_dt,
-            "next lowest price": lambda x: x.updated.next_low_price,
+            "current_time": lambda x: x.updated.current_time,
+            "next_lowest": lambda x: x.updated.next_lowest_price_dt,
+            "next_lowest price": lambda x: x.updated.next_low_price,
             "diff_now_and_next_lowest": lambda x: x.updated.diff_now_and_next_lowest,
-            "delay hours": lambda x: x.updated.delay_hours,
+            "delay_hours": lambda x: x.updated.delay_hours,
             "delay_hours_price": lambda x: x.updated.delay_hours_price,
             "diff_now_and_delay": lambda x: x.updated.diff_now_and_delay,
             "todays_highest": lambda x: x.calcs.highest_price,

@@ -4,6 +4,7 @@ Custom integration to integrate price calc with Home Assistant.
 For more details about this integration, please refer to
 https://github.com/fars-fede-fire/price_calc
 """
+
 from __future__ import annotations
 
 from asyncio import sleep
