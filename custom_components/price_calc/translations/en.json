@@ -1,0 +1,47 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "If you need help with the configuration have a look here: https://github.com/fars-fede-fire/price_calc",
+                "data": {
+                    "name": "Name of sensor",
+                    "appliance_file": "Path to appliance file",
+                    "source_sensor": "Energy price sensor"
+                }
+            },
+            "from_sensor_history": {
+                "description": "Choose sensor, start time and end time for appliance.",
+                "data": {
+                    "type": "Type of appliance",
+                    "manufactor": "Manufactor of appliance",
+                    "model": "Model of appliance",
+                    "mode": "Mode of appliance",
+                    "measure_method": "Method of measuring energy usage",
+                    "history_sensor": "Sensor of energy usage",
+                    "start_time": "Start time of appliance",
+                    "end_time": "End time of appliance"
+                }
+            },
+            "from_file": {
+                "description": "Setup from file in /data",
+                "data": {
+                    "file_selector": "Select file"
+                }
+            },
+            "from_url": {
+                "description": "Setup from https://github.com/fars-fede-fire/price_calc_data/",
+                "data": {
+                    "url": "Paste link to raw file"
+                }
+            },
+            "select_energy_price": {
+                "description": "Set name and select 'Energi Data Service' sensor",
+                "data": {
+                    "name": "Name of sensor",
+                    "source_sensor": "Select 'Energi Data Service' sensor",
+                    "add_price_data": "Adds all start times and prices as an attribute. Warning! Can generate a lot of data"
+                }
+            }
+        }
+    }
+}

@@ -26,3 +26,7 @@ tts
 scenes.yaml
 scripts.yaml
 secrets.yaml
+
+
+# Home Assistant custom components dependencies
+custom_components/energidataservice

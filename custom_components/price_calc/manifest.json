@@ -8,5 +8,13 @@
   "documentation": "https://github.com/fars-fede-fire/price_calc",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/fars-fede-fire/price_calc/issues",
+  "requirements": [
+    "numpy",
+    "pydantic"
+  ],
+  "dependencies": [],
+  "after-dependencies": [
+    "energidataservice"
+  ],
   "version": "0.0.1"
 }
