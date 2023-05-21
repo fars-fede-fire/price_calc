@@ -4,4 +4,3 @@ pip>=21.0,<23.1
 ruff==0.0.261
 pydantic
 numpy
-
