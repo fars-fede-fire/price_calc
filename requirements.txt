@@ -1,6 +1,6 @@
 colorlog==6.7.0
 homeassistant==2023.5
 pip>=21.0,<23.1
-ruff==0.0.261
+ruff==0.0.277
 pydantic
 numpy
